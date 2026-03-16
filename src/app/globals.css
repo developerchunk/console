@@ -1,26 +1,445 @@
 @import "tailwindcss";
 
+/* ─── Design Tokens ──────────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --text: #f5f5f7;
+  --text-sec: #a1a1aa;
+  --text-dim: #71717a;
+  --border: rgba(255, 255, 255, 0.09);
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-xl: 20px;
+
+  /* Compatibility aliases used by form components */
+  --text-secondary: var(--text-sec);
+  --text-tertiary: var(--text-dim);
+  --radius-sm: var(--r-sm);
+  --radius-xl: var(--r-xl);
+  --bg-elevated: #0b0f1a;
+  --bg-surface: rgba(255, 255, 255, 0.04);
+  --accent-soft: rgba(37, 99, 235, 0.12);
+  --accent-glow: rgba(37, 99, 235, 0.45);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ─── Reset ──────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #020617;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Urbanist', system-ui, sans-serif;
+  color: var(--text);
+  background: #020617;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: rgba(37, 99, 235, 0.3);
+  color: #fff;
+}
+
+canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Page shell — exactly one viewport, no scroll
+───────────────────────────────────────────────────────────────────── */
+.page-shell {
+  position: relative;
+  width: 100vw;
+  height: 100svh;
+  overflow: hidden;
+  background: #020617;
+  isolation: isolate;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Aurora layer — absolute, fills shell, behind everything
+───────────────────────────────────────────────────────────────────── */
+.aurora-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Header
+───────────────────────────────────────────────────────────────────── */
+.top-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  background: rgba(2, 6, 23, 0.6);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+
+.top-bar__logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px;
+}
+
+.logo-text {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.early-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.1);
+  border: 1px solid rgba(37, 99, 235, 0.22);
+  color: #60a5fa;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.early-badge__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #60a5fa;
+  animation: blink 2s ease-in-out infinite;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Center stage — fills shell minus header/footer, centers the card
+───────────────────────────────────────────────────────────────────── */
+.center-stage {
+  position: absolute;
+  inset: 56px 0 40px;
+  /* top = header height, bottom = footer height */
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+  /* if viewport very short, card scrolls inside */
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Card — solid opaque background, on top of aurora
+───────────────────────────────────────────────────────────────────── */
+.card {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  padding: 2rem 2rem 1.75rem;
+  border-radius: var(--r-xl);
+  background: #0b0f1a;
+  /* solid dark, clearly above aurora */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow:
+    0 0 0 1px rgba(37, 99, 235, 0.07),
+    0 24px 64px rgba(0, 0, 0, 0.75),
+    0 4px 16px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+}
+
+/* Thin blue glow on the top edge to connect card to the aurora below */
+.card__edge-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.55), transparent);
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Card contents
+───────────────────────────────────────────────────────────────────── */
+.sdui-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.1);
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  color: #60a5fa;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 1.25rem;
+}
+
+.sdui-badge__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #60a5fa;
+  box-shadow: 0 0 5px rgba(96, 165, 250, 0.6);
+}
+
+.brand-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 1.1rem;
+}
+
+.brand-logo {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.brand-name {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  margin: 0;
+  line-height: 1;
+}
+
+.brand-url {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin: 3px 0 0;
+}
+
+.desc {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-sec);
+  margin: 0 0 1.25rem;
+}
+
+.desc strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Feature grid
+───────────────────────────────────────────────────────────────────── */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+  margin-bottom: 1.25rem;
+}
+
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 9px 10px;
+  border-radius: var(--r-md);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.feature-item:hover {
+  background: rgba(255, 255, 255, 0.055);
+  border-color: rgba(255, 255, 255, 0.13);
+}
+
+.feature-item__icon {
+  font-size: 1rem;
+}
+
+.feature-item__name {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.feature-item__desc {
+  font-size: 0.63rem;
+  line-height: 1.45;
+  color: var(--text-dim);
+}
+
+/* ─── Divider + hints ─────────────────────────────────────────────── */
+.card-divider {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  margin-bottom: 1rem;
+}
+
+.card-hint {
+  font-size: 0.7rem;
+  text-align: center;
+  color: var(--text-dim);
+  margin: 0 0 0.8rem;
+}
+
+.fine-print {
+  font-size: 0.67rem;
+  text-align: center;
+  color: var(--text-dim);
+  margin: 7px 0 0;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   CTA button — solid blue, CSS-only hover
+───────────────────────────────────────────────────────────────────── */
+.cta-btn {
+  display: block;
+  width: 100%;
+  background: var(--accent);
+  border: none;
+  color: #fff;
+  font-family: 'Urbanist', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+  outline: none;
+}
+
+.cta-btn:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 0 28px rgba(37, 99, 235, 0.45);
+}
+
+.cta-btn:active {
+  background: #1e40af;
+  box-shadow: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+   Footer
+───────────────────────────────────────────────────────────────────── */
+.bottom-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(2, 6, 23, 0.6);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border);
+}
+
+.foot-link {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  transition: color 0.15s;
+}
+
+.foot-link:hover {
+  color: var(--text-sec);
+}
+
+.foot-sep {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.12);
+}
+
+.foot-copy {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+}
+
+/* ─── Animations ─────────────────────────────────────────────────── */
+@keyframes blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes waitlistOverlayIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes waitlistCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-spin {
+  animation: spin 0.8s linear infinite;
 }
