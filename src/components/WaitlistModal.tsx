@@ -76,10 +76,11 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
             onClick={e => { if (e.target === e.currentTarget) onClose(); }}
         >
             <div
-                className="card relative w-full max-w-115 max-h-[92vh] overflow-y-auto"
+                className="card relative w-full max-w-115 max-h-[92vh] flex flex-col"
                 style={{
                     boxShadow: '0 0 0 1px rgba(37, 99, 235, 0.07), 0 24px 64px rgba(0, 0, 0, 0.75), 0 4px 16px rgba(0, 0, 0, 0.5)',
                     animation: 'waitlistCardIn 140ms ease-out both',
+                    overflow: 'hidden',
                 }}
             >
                 <div className="card__edge-glow" />
@@ -97,7 +98,7 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
                     </svg>
                 </button>
 
-                <div className="p-8">
+                <div className="overflow-y-auto flex-1 p-8" style={{ overscrollBehavior: 'contain' }}>
                     {submitted ? (
                         <SuccessState onClose={onClose} />
                     ) : (
@@ -125,12 +126,12 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
                             </div>
 
                             <form onSubmit={handleSubmit} className="space-y-4">
-                                <Field label="Full Name" id="fullName" type="text" placeholder="First name Last name"
+                                <Field label="Full Name" id="fullName" type="text" placeholder="First Last"
                                     value={form.fullName} error={errors.fullName} onChange={v => set('fullName', v)} />
-                                <Field label="Email" id="email" type="email" placeholder="jane@company.com"
+                                <Field label="Email" id="email" type="email" placeholder="someone@company"
                                     hint="Business email preferred"
                                     value={form.email} error={errors.email} onChange={v => set('email', v)} />
-                                <Field label="Company" id="company" type="text" placeholder="Acme Corp"
+                                <Field label="Company" id="company" type="text" placeholder="Company Name Inc."
                                     value={form.company} error={errors.company} onChange={v => set('company', v)} />
                                 <Field label="Designation" id="designation" type="text" placeholder="Senior Android Engineer"
                                     value={form.designation} error={errors.designation} onChange={v => set('designation', v)} />
@@ -233,6 +234,19 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
                                         'Secure My Spot →'
                                     )}
                                 </button>
+
+                                {/* Book a Call */}
+                                <p className="text-center text-xs mt-3" style={{ color: 'var(--text-tertiary)', fontFamily: 'Urbanist, sans-serif' }}>
+                                    Want to discuss Ketoy for your org?{' '}
+                                    <a
+                                        href="https://calendar.app.google/U8oLuX3kXpps55vYA"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{ color: 'var(--accent-hover)', textDecoration: 'underline', textUnderlineOffset: '3px' }}
+                                    >
+                                        Book a call →
+                                    </a>
+                                </p>
                             </form>
                         </>
                     )}

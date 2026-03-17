@@ -99,6 +99,18 @@ export default function Home() {
             Join the Waitlist →
           </button>
 
+          <p style={{ textAlign: 'center', fontSize: '0.75rem', marginTop: '0.75rem', color: 'var(--text-dim)', fontFamily: 'Urbanist, sans-serif' }}>
+            Want to discuss Ketoy for your org or project?{' '}
+            <a
+              href="https://calendar.app.google/U8oLuX3kXpps55vYA"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'var(--accent-hover)', textDecoration: 'underline', textUnderlineOffset: '3px' }}
+            >
+              Book a call →
+            </a>
+          </p>
+
         </div>
       </main>
 
