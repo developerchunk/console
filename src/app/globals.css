@@ -335,8 +335,10 @@ canvas {
    CTA button — solid blue, CSS-only hover
 ───────────────────────────────────────────────────────────────────── */
 .cta-btn {
-  display: block;
+  display: flex;
   width: 100%;
+  align-items: center;
+  justify-content: center;
   background: var(--accent);
   border: none;
   color: #fff;

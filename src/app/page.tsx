@@ -3,7 +3,6 @@
 import dynamic from 'next/dynamic';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import WaitlistModal from '@/components/WaitlistModal';
 
 import Galaxy from '@/components/Galaxy';
 
@@ -14,7 +13,6 @@ const FEATURES = [
 ];
 
 export default function Home() {
-  const [modalOpen, setModalOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
 
@@ -49,12 +47,12 @@ export default function Home() {
 
       {/* Header — absolute top, z:20 */}
       <header className="top-bar">
-        <div className="top-bar__logo">
+        <a href="https://ketoy.dev" target="_blank" rel="noopener noreferrer" className="top-bar__logo" aria-label="Go to ketoy.dev">
           <div className="logo-mark">
             <Image src="/ketoy-logo.svg" alt="Ketoy" width={20} height={20} />
           </div>
           <span className="logo-text">ketoy.dev</span>
-        </div>
+        </a>
         <div className="early-badge">
           <span className="early-badge__dot" />
           Early Access
@@ -95,9 +93,15 @@ export default function Home() {
 
           <p className="card-hint">Be among the first Android teams to get early access</p>
 
-          <button className="cta-btn" style={{ padding: '0.95rem' }} onClick={() => setModalOpen(true)}>
+          <a
+            className="cta-btn"
+            style={{ padding: '0.95rem' }}
+            href="https://forms.gle/S2mHJc4FzeP8N7vG9"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Join the Waitlist →
-          </button>
+          </a>
 
           <p style={{ textAlign: 'center', fontSize: '0.75rem', marginTop: '0.75rem', color: 'var(--text-dim)', fontFamily: 'Urbanist, sans-serif' }}>
             Want to discuss Ketoy for your org or project?{' '}
@@ -122,10 +126,8 @@ export default function Home() {
         <span className="foot-sep">·</span>
         <a href="https://github.com/KetoyDev/ketoy" target="_blank" rel="noopener noreferrer" className="foot-link">GitHub</a>
         <span className="foot-sep">·</span>
-        <span className="foot-copy">© 2025 Ketoy</span>
+        <span className="foot-copy">© 2026 Ketoy</span>
       </footer>
-
-      <WaitlistModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
     </div>
   );
 }

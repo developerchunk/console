@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface WaitlistModalProps {
     isOpen: boolean;
@@ -19,20 +19,30 @@ const COUNTRIES = [
     'United States', 'Venezuela', 'Vietnam', 'Other',
 ].sort();
 
+const INITIAL_FORM = {
+    fullName: '',
+    email: '',
+    company: '',
+    designation: '',
+    country: '',
+    isLookingForSDUI: '',
+    consentData: true,
+    subscribeUpdates: true,
+};
+
 export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
-    const [form, setForm] = useState({
-        fullName: '',
-        email: '',
-        company: '',
-        designation: '',
-        country: '',
-        isLookingForSDUI: '',
-        consentData: true,
-        subscribeUpdates: true,
-    });
+    const [form, setForm] = useState(INITIAL_FORM);
     const [submitted, setSubmitted] = useState(false);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+
+    useEffect(() => {
+        if (!isOpen) return;
+        setForm(INITIAL_FORM);
+        setSubmitted(false);
+        setLoading(false);
+        setErrors({});
+    }, [isOpen]);
 
     const validate = () => {
         const errs: Record<string, string> = {};
@@ -126,7 +136,7 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
                             </div>
 
                             <form onSubmit={handleSubmit} className="space-y-4">
-                                <Field label="Full Name" id="fullName" type="text" placeholder="First Last"
+                                <Field label="Full Name" id="fullName" type="text" placeholder="First & Last"
                                     value={form.fullName} error={errors.fullName} onChange={v => set('fullName', v)} />
                                 <Field label="Email" id="email" type="email" placeholder="someone@company"
                                     hint="Business email preferred"
@@ -228,10 +238,10 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
                                             <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                                 <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
                                             </svg>
-                                            Securing your spot…
+                                            Registering…
                                         </span>
                                     ) : (
-                                        'Secure My Spot →'
+                                        'Join the Waitlist'
                                     )}
                                 </button>
 
@@ -338,7 +348,7 @@ function SuccessState({ onClose }: { onClose: () => void }) {
                 You&apos;re on the list!
             </h3>
             <p className="text-sm mb-6 leading-relaxed" style={{ color: 'var(--text-secondary)', fontFamily: 'Urbanist, sans-serif', maxWidth: 300 }}>
-                Thanks for joining the Ketoy waitlist. We&apos;ll be in touch when early access opens — keep building great apps!
+                Thanks for joining the Ketoy waitlist. We&apos;ll be in touch when early access opens, keep building great apps!
             </p>
             <button
                 onClick={onClose}

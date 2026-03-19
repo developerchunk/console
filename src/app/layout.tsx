@@ -10,7 +10,7 @@ const urbanist = Urbanist({
 });
 
 export const metadata: Metadata = {
-  title: "Ketoy — -Driven UI for Android | Join the Waitlist",
+  title: "Ketoy — Server-Driven UI for Android | Join the Waitlist",
   description:
     "The open source, server-driven UI engine for Jetpack Compose. Write K‑DSL, convert to JSON, render native UI. No Play Store approvals needed.",
   keywords:
