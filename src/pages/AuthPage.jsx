@@ -554,18 +554,17 @@ export default function AuthPage() {
         <canvas ref={canvasRef} className="dot-grid-canvas" />
         <div className="auth-vignette" />
 
+        <a
+          href="https://ketoy.dev"
+          className="absolute top-5 left-5 z-20 inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-white/90 hover:text-white hover:bg-white/[0.08] transition-colors"
+          aria-label="Go to Ketoy website"
+        >
+          <img src="/T_ketoy_logo.png" alt="Ketoy" className="h-7 w-7 rounded-md object-cover" />
+          <span className="text-sm font-semibold tracking-wide">Ketoy</span>
+        </a>
+
         <div className="w-full max-w-[500px] relative z-10">
           <div className="auth-glass-card">
-            <button
-              type="button"
-              onClick={() => {
-                window.location.href = 'https://ketoy.dev'
-              }}
-              className="absolute top-4 left-4 text-[13px] text-white/60 hover:text-white transition-colors bg-transparent border-0"
-            >
-              ← Back
-            </button>
-
             <div className="text-center mb-6 mt-2">
               <div className="inline-flex items-center justify-center mx-auto mb-4 h-10">
                 <img src="/T_ketoy_logo.png" alt="Ketoy" height="44" className="h-11 w-11 object-contain" />

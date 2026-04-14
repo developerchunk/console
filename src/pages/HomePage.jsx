@@ -18,7 +18,7 @@ const actionCards = [
   {
     title: 'API Key & Docs',
     description: 'View your app API keys and read integration docs for the Android SDK.',
-    href: 'https://ketoy.dev/docs',
+    href: 'https://docs.ketoy.dev/',
     cta: 'View Docs'
   }
 ]

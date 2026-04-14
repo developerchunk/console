@@ -168,7 +168,7 @@ export default function Layout() {
                         Profile
                       </Link>
                       <a
-                        href="https://ketoy.dev/docs"
+                        href="https://docs.ketoy.dev/"
                         target="_blank"
                         rel="noreferrer"
                         onClick={() => setShowAccountMenu(false)}
