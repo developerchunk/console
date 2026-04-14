@@ -1,0 +1,156 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ketoy-bg: #070b12;
+  --ketoy-surface: #0f1c2e;
+  --ketoy-surface-2: #121d2f;
+  --ketoy-border: rgba(255, 255, 255, 0.1);
+  --ketoy-primary: #1a73e8;
+}
+
+.ketoy-card-surface {
+  position: relative;
+  background-color: var(--ketoy-surface-2);
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0) 34%),
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.045) 0.8px, transparent 0.9px);
+  background-size: 100% 100%, 14px 14px;
+  border: 1px solid var(--ketoy-border);
+  overflow: hidden;
+}
+
+.ketoy-card-surface::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(26, 115, 232, 0.12), rgba(26, 115, 232, 0) 45%);
+  opacity: 0.35;
+}
+
+.ketoy-card-surface-soft {
+  position: relative;
+  background-color: var(--ketoy-surface);
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0) 38%),
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.03) 0.8px, transparent 0.9px);
+  background-size: 100% 100%, 16px 16px;
+  border: 1px solid var(--ketoy-border);
+  overflow: hidden;
+}
+
+.ketoy-card-content {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-ketoy {
+  border-radius: 10px;
+  border: 1px solid transparent;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+}
+
+.btn-ketoy:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-ketoy-primary {
+  background: rgba(26, 115, 232, 0.2);
+  border-color: rgba(66, 165, 245, 0.45);
+  color: #dbeafe;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.btn-ketoy-primary:hover {
+  background: rgba(26, 115, 232, 0.3);
+  border-color: rgba(96, 165, 250, 0.6);
+  color: #ffffff;
+}
+
+.btn-ketoy-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #d1d5db;
+}
+
+.btn-ketoy-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #f8fafc;
+}
+
+.btn-ketoy-danger {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(248, 113, 113, 0.5);
+  color: #fca5a5;
+}
+
+.btn-ketoy-danger:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(248, 113, 113, 0.62);
+  color: #fee2e2;
+}
+
+.btn-ketoy-amber {
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(251, 191, 36, 0.5);
+  color: #fde68a;
+}
+
+.btn-ketoy-amber:hover {
+  background: rgba(245, 158, 11, 0.24);
+  border-color: rgba(252, 211, 77, 0.62);
+  color: #fffbeb;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--ketoy-bg);
+  background-image:
+    radial-gradient(1200px 600px at 15% -10%, rgba(26, 115, 232, 0.16), transparent 60%),
+    radial-gradient(800px 400px at 90% 0%, rgba(26, 115, 232, 0.09), transparent 60%);
+  color: #e2e8f0;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
