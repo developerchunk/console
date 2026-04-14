@@ -57,6 +57,24 @@ const StatCard = ({ icon, label, value, accent }) => (
   </div>
 )
 
+const mapProjectsLoadError = (err) => {
+  const responseMessage = err?.response?.data?.message || err?.response?.data?.error?.message
+  if (responseMessage) return responseMessage
+
+  const genericMessage = String(err?.message || '').toLowerCase()
+  const isNetworkFailure = !err?.response && (
+    genericMessage.includes('network error') ||
+    genericMessage.includes('failed to fetch') ||
+    genericMessage.includes('load failed')
+  )
+
+  if (isNetworkFailure) {
+    return 'Unable to reach API from this deployed domain. Please verify Vercel env VITE_API_BASE_URL and backend CORS allowlist for this site.'
+  }
+
+  return err?.message || 'Failed to fetch apps'
+}
+
 export default function ProjectsPage() {
   const navigate = useNavigate()
   const { apps, setApps, setLoading, loading, error, setError } = useAppStore()
@@ -96,7 +114,7 @@ export default function ProjectsPage() {
       setNextToken(Array.isArray(payload) ? null : payload?.nextToken || null)
       setError(null)
     } catch (err) {
-      setError(err?.response?.data?.message || err?.message || 'Failed to fetch apps')
+      setError(mapProjectsLoadError(err))
     } finally {
       if (append) {
         setLoadingMore(false)
