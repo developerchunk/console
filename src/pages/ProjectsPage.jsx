@@ -69,7 +69,7 @@ const mapProjectsLoadError = (err) => {
   )
 
   if (isNetworkFailure) {
-    return 'Unable to reach API from this deployed domain. Please verify Vercel env VITE_API_BASE_URL and backend CORS allowlist for this site.'
+    return 'Network Error'
   }
 
   return err?.message || 'Failed to fetch apps'
