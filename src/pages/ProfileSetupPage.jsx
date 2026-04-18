@@ -7,10 +7,7 @@ const USERNAME_REGEX = /^[a-z0-9-]{3,20}$/
 
 export default function ProfileSetupPage() {
   const navigate = useNavigate()
-  const { developer, updateDeveloper } = useAuthStore((state) => ({
-    developer: state.developer,
-    updateDeveloper: state.updateDeveloper
-  }))
+  const updateDeveloper = useAuthStore((state) => state.updateDeveloper)
   const [checking, setChecking] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
@@ -21,10 +18,11 @@ export default function ProfileSetupPage() {
     const checkProfile = async () => {
       try {
         const response = await profileAPI.getMyProfile()
-        const data = response.data?.data || response.data || {}
+        const payload = response?.data?.data || response?.data || {}
+        const data = payload?.profile || payload?.developer || payload
 
         if (data.username) {
-          updateDeveloper({ ...(developer || {}), ...data })
+          updateDeveloper({ ...data, username: String(data.username).trim() })
           navigate('/apps', { replace: true })
           return
         }
@@ -38,7 +36,7 @@ export default function ProfileSetupPage() {
     }
 
     checkProfile()
-  }, [developer, navigate, updateDeveloper])
+  }, [navigate, updateDeveloper])
 
   const usernameError = useMemo(() => {
     if (!formData.username) return ''
@@ -63,10 +61,11 @@ export default function ProfileSetupPage() {
     setSubmitting(true)
     try {
       const response = await profileAPI.setupProfile({ username, displayName })
-      const data = response.data?.data || response.data || {}
+      const payload = response?.data?.data || response?.data || {}
+      const data = payload?.profile || payload?.developer || payload
       const profileNamespace = data.namespace || `dev.ketoy.${username}`
 
-      updateDeveloper({ ...(developer || {}), username: data.username || username, displayName, namespace: profileNamespace })
+      updateDeveloper({ username: data.username || username, displayName, namespace: profileNamespace })
       setNamespace(profileNamespace)
 
       window.setTimeout(() => {

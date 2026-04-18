@@ -7,7 +7,11 @@ export const useScreenStore = create((set) => ({
   loading: false,
   error: null,
   
-  setScreens: (screens) => set({ screens }),
+  setScreens: (screensOrUpdater) => set((state) => ({
+    screens: typeof screensOrUpdater === 'function'
+      ? screensOrUpdater(state.screens)
+      : screensOrUpdater
+  })),
   setCurrentScreen: (screen) => set({ currentScreen: screen }),
   setJsonContent: (jsonContent) => set({ jsonContent }),
   setLoading: (loading) => set({ loading }),

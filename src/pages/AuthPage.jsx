@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 
@@ -15,6 +15,26 @@ const decodeJwtPayload = (token) => {
     return JSON.parse(decoded)
   } catch {
     return null
+  }
+}
+
+const getPasswordValidation = (password) => {
+  const value = String(password || '')
+  const requirements = [
+    { ok: value.length >= 8, label: 'at least 8 characters' },
+    { ok: /[A-Z]/.test(value), label: 'one uppercase letter' },
+    { ok: /[a-z]/.test(value), label: 'one lowercase letter' },
+    { ok: /\d/.test(value), label: 'one number' },
+    { ok: /[^A-Za-z0-9]/.test(value), label: 'one symbol (e.g. ! @ # $)' }
+  ]
+
+  const missing = requirements.filter((rule) => !rule.ok).map((rule) => rule.label)
+  return {
+    isValid: missing.length === 0,
+    missing,
+    message: missing.length > 0
+      ? `Password must include ${missing.join(', ')}.`
+      : ''
   }
 }
 
@@ -36,6 +56,8 @@ export default function AuthPage() {
   const [signupMessage, setSignupMessage] = useState('')
   const [slideDirection, setSlideDirection] = useState('right')
   const [showSignupPassword, setShowSignupPassword] = useState(false)
+  const [signupPasswordTouched, setSignupPasswordTouched] = useState(false)
+  const [newPasswordTouched, setNewPasswordTouched] = useState(false)
   const [signupEmail, setSignupEmail] = useState('')
   const [formData, setFormData] = useState({
     username: '',
@@ -46,6 +68,16 @@ export default function AuthPage() {
     password: '',
     confirmationCode: ''
   })
+
+  const signupPasswordValidation = useMemo(
+    () => getPasswordValidation(signupData.password),
+    [signupData.password]
+  )
+
+  const newPasswordValidation = useMemo(
+    () => getPasswordValidation(formData.newPassword),
+    [formData.newPassword]
+  )
 
   useEffect(() => {
     if (developerToken) {
@@ -254,9 +286,16 @@ export default function AuthPage() {
 
   const handleSignUp = async (e) => {
     e.preventDefault()
-    setLoading(true)
     setError(null)
     setSignupMessage('')
+    setSignupPasswordTouched(true)
+
+    if (!signupPasswordValidation.isValid) {
+      setError(signupPasswordValidation.message)
+      return
+    }
+
+    setLoading(true)
 
     if (!COGNITO_CLIENT_ID) {
       setError('Missing VITE_COGNITO_CLIENT_ID in environment configuration.')
@@ -359,8 +398,15 @@ export default function AuthPage() {
 
   const handleNewPasswordSubmit = async (e) => {
     e.preventDefault()
-    setLoading(true)
     setError(null)
+    setNewPasswordTouched(true)
+
+    if (!newPasswordValidation.isValid) {
+      setError(newPasswordValidation.message)
+      return
+    }
+
+    setLoading(true)
 
     if (!COGNITO_CLIENT_ID) {
       setError('Missing VITE_COGNITO_CLIENT_ID in environment configuration.')
@@ -426,6 +472,8 @@ export default function AuthPage() {
       setChallengeSession('')
       setSignupStep('signup')
       setSignupData((prev) => ({ ...prev, confirmationCode: '' }))
+      setSignupPasswordTouched(false)
+      setNewPasswordTouched(false)
     }
   }
 
@@ -556,19 +604,18 @@ export default function AuthPage() {
 
         <a
           href="https://ketoy.dev"
-          className="absolute top-5 left-5 z-20 inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-3 py-2 text-white/90 hover:text-white hover:bg-white/[0.08] transition-colors"
-          aria-label="Go to Ketoy website"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute top-6 left-6 z-20 inline-flex items-center gap-2 text-white/85 hover:text-white transition-colors"
+          aria-label="Open Ketoy website"
         >
-          <img src="/T_ketoy_logo.png" alt="Ketoy" className="h-7 w-7 rounded-md object-cover" />
-          <span className="text-sm font-semibold tracking-wide">Ketoy</span>
+          <img src="/T_ketoy_logo.png" alt="Ketoy" className="h-9 w-9 object-contain" />
+          <span className="text-base font-semibold tracking-wide">Ketoy</span>
         </a>
 
         <div className="w-full max-w-[500px] relative z-10">
           <div className="auth-glass-card">
             <div className="text-center mb-6 mt-2">
-              <div className="inline-flex items-center justify-center mx-auto mb-4 h-10">
-                <img src="/T_ketoy_logo.png" alt="Ketoy" height="44" className="h-11 w-11 object-contain" />
-              </div>
               <div
                 key={authMode}
                 className={`slide-from-${slideDirection}`}
@@ -646,6 +693,7 @@ export default function AuthPage() {
                     placeholder="Create password"
                     value={signupData.password}
                     onChange={handleSignupChange}
+                    onBlur={() => setSignupPasswordTouched(true)}
                     required
                     className="auth-input text-sm pr-24"
                   />
@@ -657,6 +705,12 @@ export default function AuthPage() {
                     {showSignupPassword ? 'Hide' : 'Show'}
                   </button>
                 </div>
+
+                {signupPasswordTouched && signupData.password && !signupPasswordValidation.isValid && (
+                  <p className="text-[11px] text-amber-300 px-1">
+                    {signupPasswordValidation.message}
+                  </p>
+                )}
 
                 <button
                   type="submit"
@@ -761,9 +815,16 @@ export default function AuthPage() {
                 placeholder="New password"
                 value={formData.newPassword}
                 onChange={handleChange}
+                onBlur={() => setNewPasswordTouched(true)}
                 required
                 className="auth-input text-sm"
               />
+
+              {newPasswordTouched && formData.newPassword && !newPasswordValidation.isValid && (
+                <p className="text-[11px] text-amber-300 px-1">
+                  {newPasswordValidation.message}
+                </p>
+              )}
 
               <button
                 type="submit"

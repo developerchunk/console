@@ -18,7 +18,7 @@ const actionCards = [
   {
     title: 'API Key & Docs',
     description: 'View your app API keys and read integration docs for the Android SDK.',
-    href: 'https://docs.ketoy.dev/',
+    href: 'https://docs.ketoy.dev',
     cta: 'View Docs'
   }
 ]
@@ -26,6 +26,7 @@ const actionCards = [
 export default function HomePage() {
   const { developer } = useAuthStore()
   const displayName = getDisplayUsername(developer)
+  const welcomeName = String(displayName || '').split('@')[0] || 'Developer'
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
@@ -33,7 +34,7 @@ export default function HomePage() {
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
           <div>
             <p className="text-xs uppercase tracking-[0.18em] text-blue-100/80">Home</p>
-            <h1 className="mt-3 text-3xl sm:text-4xl font-semibold text-white">Welcome back, {displayName}</h1>
+            <h1 className="mt-3 text-3xl sm:text-4xl font-semibold text-white">Welcome back, {welcomeName}</h1>
             <p className="mt-2 text-blue-100/80 max-w-2xl">
               Build, preview, and ship SDUI screens with a faster workflow and clearer project visibility.
             </p>

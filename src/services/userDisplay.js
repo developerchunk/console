@@ -1,5 +1,5 @@
+const USERNAME_KEY = 'ketoy_username'
 const TOKEN_KEY = 'developerToken'
-const PROFILE_DISPLAY_NAME_KEY = 'ketoy_profile_display_name'
 
 const decodeTokenPayload = (token) => {
   if (!token || typeof token !== 'string') return null
@@ -16,26 +16,50 @@ const decodeTokenPayload = (token) => {
   }
 }
 
-const normalizeText = (value) => {
-  if (typeof value !== 'string') return ''
-  return value.trim()
+const usernameFromEmail = (email) => {
+  if (!email || typeof email !== 'string') return ''
+  return email.split('@')[0]?.trim() || ''
+}
+
+const normalizeUsername = (value) => {
+  if (!value || typeof value !== 'string') return ''
+  const trimmed = value.trim()
+  if (!trimmed) return ''
+  if (trimmed.includes('@')) return usernameFromEmail(trimmed)
+  return trimmed
+}
+
+const normalizeProfileUsername = (value) => {
+  if (!value || typeof value !== 'string') return ''
+  const trimmed = value.trim()
+  if (!trimmed || trimmed.includes('@')) return ''
+  return trimmed
 }
 
 export const getDisplayUsername = (developer) => {
-  const fromDeveloperDisplayName = normalizeText(developer?.displayName)
-  const fromDeveloperName = normalizeText(developer?.name)
-  const fromDeveloperEmail = normalizeText(developer?.email)
+  const developerProfileUsername = normalizeProfileUsername(developer?.username)
 
   if (typeof window === 'undefined') {
-    return fromDeveloperDisplayName || fromDeveloperName || fromDeveloperEmail || 'Developer'
+    return (
+      developerProfileUsername ||
+      normalizeUsername(developer?.name) ||
+      usernameFromEmail(developer?.email) ||
+      'Developer'
+    )
   }
 
-  const storedDisplayName = normalizeText(localStorage.getItem(PROFILE_DISPLAY_NAME_KEY))
-  if (storedDisplayName) return storedDisplayName
+  const storedUsername = normalizeProfileUsername(localStorage.getItem(USERNAME_KEY))
+  if (storedUsername) return storedUsername
+
+  if (developerProfileUsername) return developerProfileUsername
 
   const token = localStorage.getItem(TOKEN_KEY)
   const payload = decodeTokenPayload(token)
-  const claimEmail = normalizeText(payload?.email || payload?.['cognito:username'])
+  const tokenUsername =
+    normalizeProfileUsername(payload?.['cognito:username']) ||
+    usernameFromEmail(payload?.email)
 
-  return fromDeveloperDisplayName || fromDeveloperName || fromDeveloperEmail || claimEmail || 'Developer'
+  if (tokenUsername) return tokenUsername
+
+  return normalizeUsername(developer?.name) || usernameFromEmail(developer?.email) || 'Developer'
 }

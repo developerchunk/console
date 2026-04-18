@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Outlet, Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { getDisplayUsername } from '../services/userDisplay'
@@ -9,12 +9,10 @@ const PROFILE_STATUS_KEY = 'ketoy_profile_status'
 export default function Layout() {
   const { developer, logout } = useAuthStore()
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
-  const [showAccountMenu, setShowAccountMenu] = useState(false)
   const [profileStatus, setProfileStatus] = useState(localStorage.getItem(PROFILE_STATUS_KEY) || 'unknown')
-  const accountMenuRef = useRef(null)
   const navigate = useNavigate()
   const location = useLocation()
-  const displayName = getDisplayUsername(developer)
+  const displayName = String(getDisplayUsername(developer) || 'Developer').trim()
   const profileInitial = (displayName || 'U').trim().charAt(0).toUpperCase()
   const canGoBack = location.pathname !== '/projects'
 
@@ -33,10 +31,10 @@ export default function Layout() {
   }
 
   const navItemClass = ({ isActive }) => `
-    flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200
+    sidebar-aura-pill flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border
     ${isActive
-      ? 'bg-[#1A73E8]/20 text-white border border-[#1A73E8]/40'
-      : 'text-gray-300 hover:text-white hover:bg-white/[0.06] border border-transparent'}
+      ? 'sidebar-aura-pill-active text-white border-[#1A73E8]/55'
+      : 'text-gray-400 hover:text-white border-transparent'}
   `
 
   useEffect(() => {
@@ -52,32 +50,113 @@ export default function Layout() {
     return () => window.removeEventListener('ketoy-profile-complete-changed', handleProfileChange)
   }, [])
 
-  useEffect(() => {
-    if (!showAccountMenu) return undefined
-
-    const handleClickOutside = (event) => {
-      if (accountMenuRef.current && !accountMenuRef.current.contains(event.target)) {
-        setShowAccountMenu(false)
-      }
-    }
-
-    const handleEscape = (event) => {
-      if (event.key === 'Escape') setShowAccountMenu(false)
-    }
-
-    window.addEventListener('mousedown', handleClickOutside)
-    window.addEventListener('keydown', handleEscape)
-    return () => {
-      window.removeEventListener('mousedown', handleClickOutside)
-      window.removeEventListener('keydown', handleEscape)
-    }
-  }, [showAccountMenu])
-
   return (
     <div className="h-screen overflow-hidden bg-[#070b12] text-white">
+      <style>{`
+        @keyframes sidebarAuraDrift {
+          0% { transform: translate3d(-26%, -24%, 0) rotate(0deg); }
+          50% { transform: translate3d(8%, 14%, 0) rotate(180deg); }
+          100% { transform: translate3d(-26%, -24%, 0) rotate(360deg); }
+        }
+
+        .sidebar-aura-pill {
+          position: relative;
+          overflow: hidden;
+          isolation: isolate;
+          background: rgba(255, 255, 255, 0.012);
+        }
+
+        .sidebar-aura-pill::before {
+          content: '';
+          position: absolute;
+          left: -44%;
+          top: -58%;
+          width: 175%;
+          height: 175%;
+          border-radius: 42%;
+          background: radial-gradient(circle at 32% 30%, rgba(96,165,250,0.2), rgba(59,130,246,0.08) 35%, rgba(59,130,246,0) 64%);
+          filter: blur(15px);
+          animation: sidebarAuraDrift 17s linear infinite;
+          opacity: 0.1;
+          pointer-events: none;
+          z-index: 0;
+        }
+
+        .sidebar-aura-pill::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          background: linear-gradient(145deg, rgba(255,255,255,0.026), rgba(15,23,42,0.24));
+          opacity: 0.52;
+          pointer-events: none;
+          z-index: 0;
+        }
+
+        .sidebar-aura-pill > * {
+          position: relative;
+          z-index: 1;
+        }
+
+        .sidebar-aura-pill:hover {
+          background: rgba(255, 255, 255, 0.045);
+        }
+
+        .sidebar-aura-pill:hover::before {
+          opacity: 0.15;
+        }
+
+        .sidebar-aura-pill-active {
+          background: rgba(11, 35, 64, 0.7);
+          box-shadow: inset 0 0 0 1px rgba(26, 115, 232, 0.2);
+        }
+
+        .sidebar-aura-pill-active::before {
+          opacity: 0.2;
+        }
+
+        .sidebar-aura-card {
+          position: relative;
+          overflow: hidden;
+          isolation: isolate;
+        }
+
+        .sidebar-aura-card::before {
+          content: '';
+          position: absolute;
+          left: -40%;
+          top: -56%;
+          width: 170%;
+          height: 170%;
+          border-radius: 40%;
+          background: radial-gradient(circle at 30% 32%, rgba(96,165,250,0.16), rgba(59,130,246,0.06) 36%, rgba(59,130,246,0) 65%);
+          filter: blur(14px);
+          animation: sidebarAuraDrift 18s linear infinite;
+          opacity: 0.1;
+          pointer-events: none;
+          z-index: 0;
+        }
+
+        .sidebar-aura-card::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          background: linear-gradient(145deg, rgba(255,255,255,0.022), rgba(15,23,42,0.24));
+          pointer-events: none;
+          z-index: 0;
+        }
+
+        .sidebar-aura-card > * {
+          position: relative;
+          z-index: 1;
+        }
+      `}</style>
+
       <div className="flex h-full">
-        <aside className="hidden md:flex md:w-64 lg:w-72 shrink-0 sticky top-0 h-screen overflow-y-auto flex-col border-r border-white/10 bg-[linear-gradient(180deg,rgba(26,115,232,0.12),rgba(7,11,18,0)_24%),#0b1320]">
-          <div className="px-5 pt-6 pb-4 border-b border-white/10">
+        <aside className="hidden md:flex md:w-64 lg:w-72 shrink-0 sticky top-0 h-screen overflow-y-auto flex-col border-r border-white/10 bg-[linear-gradient(180deg,rgba(26,115,232,0.14),rgba(26,115,232,0)_24%),#040507]">
+          <div className="relative z-10 flex min-h-full flex-col">
+          <div className="px-5 h-16 border-b border-white/10 flex items-center">
             <Link to="/projects" className="flex items-center gap-3">
               <img
                 src="/T_ketoy_logo.png"
@@ -94,18 +173,74 @@ export default function Layout() {
           </div>
 
           <nav className="px-4 py-5 space-y-2">
+            <p className="px-3 pb-1 text-[11px] font-semibold tracking-[0.12em] text-gray-500">MAIN</p>
             <NavLink to="/projects" className={navItemClass}>
+              <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M3 7a2 2 0 012-2h14a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M8 3v4M16 3v4" />
+              </svg>
               <span>Projects</span>
             </NavLink>
+            <NavLink to="/profile" className={navItemClass}>
+              <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M4 19a8 8 0 0116 0" />
+              </svg>
+              <span>Profile</span>
+            </NavLink>
+
+            <div className="pt-4 mt-4 border-t border-white/10 space-y-2">
+              <p className="px-3 pb-1 text-[11px] font-semibold tracking-[0.12em] text-gray-500">SUPPORT</p>
+              <a
+                href="https://docs.ketoy.dev"
+                target="_blank"
+                rel="noreferrer"
+                className="sidebar-aura-pill flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-400 hover:text-white transition-all duration-200 border border-transparent"
+              >
+                <span className="inline-flex items-center gap-3">
+                  <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M5 4h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M8 8h8M8 12h8M8 16h5" />
+                  </svg>
+                  <span>Documentation</span>
+                </span>
+                <svg className="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M14 5h5m0 0v5m0-5L10 14" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M5 9v10h10" />
+                </svg>
+              </a>
+
+              <NavLink to="/contact" className={navItemClass}>
+                <svg className="w-4 h-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8" />
+                  <rect x="3" y="6" width="18" height="12" rx="2" ry="2" strokeWidth={1.7} />
+                </svg>
+                <span>Contact Us</span>
+              </NavLink>
+            </div>
           </nav>
 
           <div className="mt-auto p-4">
-            <div className="ketoy-card-surface-soft rounded-2xl px-4 py-3">
-              <div className="ketoy-card-content">
-                <p className="text-xs uppercase tracking-[0.16em] text-gray-400">Signed in as</p>
-                <p className="mt-2 text-sm font-medium text-gray-100 truncate">{displayName}</p>
+            <div className="sidebar-aura-card rounded-2xl px-3 py-3 border border-white/10 bg-white/[0.03]">
+              <div className="flex items-center gap-3">
+                <span className="relative inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[#0b0f14] text-sm font-semibold text-white ring-1 ring-white/20">
+                  {profileInitial}
+                  {profileStatus === 'incomplete' && (
+                    <span className="absolute -right-0.5 -bottom-0.5 h-2.5 w-2.5 rounded-full bg-amber-400 ring-2 ring-[#040507]" aria-hidden="true" />
+                  )}
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-gray-100 truncate">{displayName}</p>
+                </div>
               </div>
+              <button
+                onClick={() => setShowLogoutConfirm(true)}
+                className="mt-3 w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-xs font-medium text-gray-300 hover:text-white hover:bg-white/[0.06]"
+              >
+                Logout
+              </button>
             </div>
+          </div>
           </div>
         </aside>
 
@@ -135,61 +270,8 @@ export default function Layout() {
                 </Link>
               </div>
 
-              <div className="relative" ref={accountMenuRef}>
-                <button
-                  onClick={() => setShowAccountMenu((prev) => !prev)}
-                  className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-2 py-1.5 hover:bg-white/[0.08] transition-colors"
-                  aria-haspopup="menu"
-                  aria-expanded={showAccountMenu}
-                  aria-label="Account menu"
-                >
-                  <span className="hidden sm:block text-gray-200 text-sm max-w-[140px] truncate">{displayName}</span>
-                  <span className="relative inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#1A73E8]/30 text-sm font-semibold text-white ring-1 ring-white/20">
-                    {profileInitial}
-                    {profileStatus === 'incomplete' && (
-                      <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-amber-400 ring-2 ring-[#0d1624]" aria-hidden="true" />
-                    )}
-                  </span>
-                </button>
-
-                {showAccountMenu && (
-                  <div className="absolute right-0 top-11 z-40 w-56 overflow-hidden rounded-xl border border-white/15 bg-[#0f1a2a] shadow-2xl shadow-black/40" role="menu">
-                    <div className="border-b border-white/10 px-4 py-3">
-                      <p className="text-sm font-medium text-white truncate">{displayName}</p>
-                      <p className="text-xs text-gray-400">Account</p>
-                    </div>
-                    <div className="p-1.5">
-                      <Link
-                        to="/profile"
-                        onClick={() => setShowAccountMenu(false)}
-                        className="flex w-full items-center rounded-lg px-3 py-2 text-sm text-gray-200 hover:bg-white/10"
-                        role="menuitem"
-                      >
-                        Profile
-                      </Link>
-                      <a
-                        href="https://docs.ketoy.dev/"
-                        target="_blank"
-                        rel="noreferrer"
-                        onClick={() => setShowAccountMenu(false)}
-                        className="flex w-full items-center rounded-lg px-3 py-2 text-sm text-gray-200 hover:bg-white/10"
-                        role="menuitem"
-                      >
-                        Docs
-                      </a>
-                      <button
-                        onClick={() => {
-                          setShowAccountMenu(false)
-                          setShowLogoutConfirm(true)
-                        }}
-                        className="mt-1 flex w-full items-center rounded-lg px-3 py-2 text-sm text-red-300 hover:bg-red-500/15"
-                        role="menuitem"
-                      >
-                        Logout
-                      </button>
-                    </div>
-                  </div>
-                )}
+              <div className="hidden sm:flex items-center h-full text-xs uppercase tracking-[0.12em] text-gray-500">
+                Workspace
               </div>
             </div>
           </header>

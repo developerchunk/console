@@ -15,10 +15,11 @@ export default function ProfileGuard({ children }) {
     const checkProfile = async () => {
       try {
         const response = await profileAPI.getMyProfile()
-        const data = response.data?.data || response.data || {}
+        const payload = response?.data?.data || response?.data || {}
+        const data = payload?.profile || payload?.developer || payload
 
         if (data.username) {
-          updateDeveloper(data)
+          updateDeveloper({ ...data, username: String(data.username).trim() })
           if (location.pathname === '/profile/setup') {
             navigate('/apps', { replace: true })
           }

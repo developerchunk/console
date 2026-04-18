@@ -21,11 +21,7 @@ export default function APIKeysManagementPage() {
   const [keys, setKeys] = useState([])
   const [loading, setLoading] = useState(false)
   const [creating, setCreating] = useState(false)
-  const [revokingId, setRevokingId] = useState(null)
-  const [pendingRevokeId, setPendingRevokeId] = useState('')
-  const [pendingRevokeLabel, setPendingRevokeLabel] = useState('')
-  const [showRevokeWarning, setShowRevokeWarning] = useState(false)
-  const [revokeWarningAccepted, setRevokeWarningAccepted] = useState(false)
+  const [revokingId, setRevokingId] = useState('')
   const [error, setError] = useState('')
   const [newKeyValue, setNewKeyValue] = useState('')
   const [newKeyId, setNewKeyId] = useState('')
@@ -144,23 +140,8 @@ echo "API_KEY=\${API_KEY:0:20}..."`,
     }
   }
 
-  const closeRevokeWarning = () => {
-    setShowRevokeWarning(false)
-    setPendingRevokeId('')
-    setPendingRevokeLabel('')
-    setRevokeWarningAccepted(false)
-  }
-
-  const promptRevokeWarning = (keyId, keyLabel) => {
-    setPendingRevokeId(keyId || '')
-    setPendingRevokeLabel(keyLabel || '')
-    setRevokeWarningAccepted(false)
-    setShowRevokeWarning(true)
-  }
-
   const handleRevoke = async (keyId) => {
     if (!keyId) return
-    closeRevokeWarning()
     setRevokingId(keyId)
     setError('')
     try {
@@ -169,7 +150,7 @@ echo "API_KEY=\${API_KEY:0:20}..."`,
     } catch (err) {
       setError(err?.response?.data?.error?.message || err?.message || 'Failed to revoke key')
     } finally {
-      setRevokingId(null)
+      setRevokingId('')
     }
   }
 
@@ -296,7 +277,6 @@ echo "API_KEY=\${API_KEY:0:20}..."`,
               <tbody className="divide-y divide-white/10 bg-[#111a2a]">
                 {keys.map((key) => {
                   const id = key.keyId || key.id || key._id || ''
-                  const isRevoking = Boolean(id) && revokingId === id
                   return (
                     <tr key={id || `${key.label}-${key.createdAt}`}>
                       <td className="px-3 py-2 font-mono text-xs text-gray-200">{id || '-'}</td>
@@ -314,11 +294,11 @@ echo "API_KEY=\${API_KEY:0:20}..."`,
                           </button>
                           <button
                             type="button"
-                            onClick={() => promptRevokeWarning(id, key.label || '')}
-                            disabled={isRevoking}
+                            onClick={() => handleRevoke(id)}
+                            disabled={revokingId === id}
                             className="btn-ketoy btn-ketoy-danger !px-2.5 !py-1.5 !text-xs"
                           >
-                            {isRevoking ? 'Revoking...' : 'Revoke'}
+                            {revokingId === id ? 'Revoking...' : 'Revoke'}
                           </button>
                         </div>
                       </td>
@@ -360,56 +340,6 @@ echo "API_KEY=\${API_KEY:0:20}..."`,
       {copyMessage && (
         <div className="fixed bottom-5 right-5 rounded-lg border border-emerald-500/40 bg-emerald-500/20 px-3 py-2 text-xs text-emerald-100">
           {copyMessage}
-        </div>
-      )}
-
-      {showRevokeWarning && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-          <div className="w-full max-w-xl rounded-xl border border-red-500/50 bg-[#240f14] p-5 shadow-2xl">
-            <h3 className="text-lg font-semibold text-red-200">Warning: Permanently revoke API key</h3>
-            <p className="mt-3 text-sm text-red-100/90">
-              Revoking this key will permanently remove API access for any teams or developers currently using it for this app.
-            </p>
-            <p className="mt-2 text-sm text-red-100/90">
-              This action is not reversible.
-            </p>
-            {pendingRevokeLabel && (
-              <p className="mt-3 text-xs text-red-200/90">
-                Label: <span className="font-mono">{pendingRevokeLabel}</span>
-              </p>
-            )}
-            {!pendingRevokeId && (
-              <p className="mt-3 text-xs text-amber-200">
-                This key cannot be revoked because key ID is missing.
-              </p>
-            )}
-            <label className="mt-4 flex items-start gap-2 text-sm text-red-100/95">
-              <input
-                type="checkbox"
-                checked={revokeWarningAccepted}
-                onChange={(event) => setRevokeWarningAccepted(event.target.checked)}
-                className="mt-0.5 h-4 w-4 rounded border-red-300 bg-[#3a1a22]"
-              />
-              <span>I understand the warning.</span>
-            </label>
-            <div className="mt-5 flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={closeRevokeWarning}
-                className="btn-ketoy btn-ketoy-secondary !px-3 !py-1.5 !text-xs"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={() => handleRevoke(pendingRevokeId)}
-                disabled={!revokeWarningAccepted || !pendingRevokeId}
-                className="btn-ketoy btn-ketoy-danger !px-3 !py-1.5 !text-xs disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Revoke API Key
-              </button>
-            </div>
-          </div>
         </div>
       )}
     </div>
